@@ -97,7 +97,7 @@
         <p class="eyebrow">Enthüllung</p>
         <h2>Antworten</h2>
         <ul id="answers-list" class="answer-list"></ul>
-        <button id="answers-next-btn" class="btn btn-primary hidden" onclick="hostAdvance('voting')">Weiter</button>
+        <button id="answers-next-btn" class="btn btn-primary hidden" onclick="hostAdvance('correct')">Weiter</button>
         <p id="answers-wait-hint" class="hint-text hidden">Warte auf den Host …</p>
       </div>
     </section>
@@ -109,6 +109,12 @@
 
         <div id="voting-form">
           <ul id="voting-options" class="vote-list"></ul>
+
+          <div id="voting-selected-answer" class="hidden voting-answer-preview">
+            <p class="eyebrow" id="voting-selected-name"></p>
+            <p id="voting-selected-text" class="voting-answer-text"></p>
+          </div>
+
           <button id="voting-submit-btn" class="btn btn-primary" disabled onclick="handleSubmitVote()">Stimme abschicken</button>
         </div>
 
@@ -118,7 +124,7 @@
           <p id="voting-progress" class="hint-text"></p>
         </div>
 
-        <button id="voting-next-btn" class="btn btn-primary hidden" onclick="hostAdvance('correct')">Weiter</button>
+        <button id="voting-next-btn" class="btn btn-primary hidden" onclick="hostAdvance('imposter')">Weiter</button>
         <p id="voting-wait-hint" class="hint-text hidden">Warte auf den Host …</p>
       </div>
     </section>
@@ -129,10 +135,11 @@
         <p id="correct-question-text" class="question-text"></p>
         <h3>Alle Antworten</h3>
         <ul id="correct-answers-list" class="answer-list"></ul>
-        <button id="correct-next-btn" class="btn btn-primary hidden" onclick="hostAdvance('imposter')">Weiter</button>
+        <button id="correct-next-btn" class="btn btn-primary hidden" onclick="hostAdvance('voting')">Weiter</button>
         <p id="correct-wait-hint" class="hint-text hidden">Warte auf den Host …</p>
       </div>
     </section>
+
 
     <section id="imposter-screen" class="screen hidden">
       <div class="card imposter-card">
