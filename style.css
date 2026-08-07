@@ -355,6 +355,68 @@ input:focus { border-color: var(--amber-dark); background: #fff; }
 }
 .redact-bar { transform-origin: right; }
 
+.vote-list {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 16px;
+  text-align: left;
+}
+
+.vote-option {
+  width: 100%;
+  display: block;
+  text-align: left;
+  background: rgba(255,255,255,0.5);
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.vote-option:hover { border-color: var(--amber-dark); }
+.vote-option.selected {
+  border-color: var(--danger);
+  background: rgba(165, 57, 47, 0.12);
+  color: var(--danger-dark);
+}
+
+.vote-summary-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 8px;
+  text-align: left;
+}
+.vote-summary-list li {
+  background: rgba(255,255,255,0.5);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 12px;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+.vote-summary-list li.correct-guess { border-color: var(--amber-dark); }
+.vote-summary-list li.correct-guess::after {
+  content: "✓ richtig";
+  float: right;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--amber-dark);
+  font-weight: 700;
+}
+.vote-summary-list li.wrong-guess::after {
+  content: "✕ falsch";
+  float: right;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
 .drinks-list { text-align: left; margin: 6px 0 8px; }
 
 .drink-counter {
