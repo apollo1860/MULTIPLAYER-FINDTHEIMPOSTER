@@ -894,18 +894,22 @@ function renderVoting(room) {
 
         const optionsList = $('voting-options');
         optionsList.innerHTML = '';
+        const answers = room.answers || {};
         ids.forEach(pid => {
             const li = document.createElement('li');
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.classList.add('vote-option');
             btn.dataset.pid = pid;
+            btn.dataset.name = players[pid].name;
+            btn.dataset.answer = answers[pid] ? answers[pid].answer : '(keine Antwort abgegeben)';
             btn.innerText = players[pid].name;
             btn.onclick = () => selectSuspect(pid);
             li.appendChild(btn);
             optionsList.appendChild(li);
         });
         $('voting-submit-btn').disabled = true;
+        hide('voting-selected-answer');
     }
 
     if (hasVotedLocally || alreadyVoted) {
@@ -930,8 +934,19 @@ function renderVoting(room) {
 function selectSuspect(pid) {
     selectedSuspectId = pid;
     const buttons = document.querySelectorAll('#voting-options .vote-option');
-    buttons.forEach(btn => btn.classList.toggle('selected', btn.dataset.pid === pid));
+    let target = null;
+    buttons.forEach(btn => {
+        const isMatch = btn.dataset.pid === pid;
+        btn.classList.toggle('selected', isMatch);
+        if (isMatch) target = btn;
+    });
     $('voting-submit-btn').disabled = false;
+
+    if (target) {
+        $('voting-selected-name').innerText = `Antwort von ${target.dataset.name}`;
+        $('voting-selected-text').innerText = target.dataset.answer;
+        show('voting-selected-answer');
+    }
 }
 
 function handleSubmitVote() {
