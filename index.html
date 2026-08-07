@@ -15,7 +15,10 @@
 <div class="app">
   <header class="topbar">
     <span class="topbar-title">FIND THE IMPOSTER</span>
-    <button id="info-icon" class="icon-btn" onclick="openInfoPopup()" aria-label="Spielanleitung">ℹ️</button>
+    <div class="topbar-actions">
+      <button id="leave-icon" class="icon-btn hidden" onclick="handleLeaveGame()" aria-label="Spiel verlassen">🚪</button>
+      <button id="info-icon" class="icon-btn" onclick="openInfoPopup()" aria-label="Spielanleitung">ℹ️</button>
+    </div>
   </header>
 
   <div id="info-popup" class="popup hidden">
