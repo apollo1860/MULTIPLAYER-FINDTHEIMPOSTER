@@ -391,6 +391,22 @@ input:focus { border-color: var(--amber-dark); background: #fff; }
   color: var(--danger-dark);
 }
 
+.voting-answer-preview {
+  background: rgba(227, 165, 61, 0.14);
+  border: 2px solid var(--amber-dark);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 4px 0 16px;
+  text-align: left;
+}
+.voting-answer-preview .eyebrow { margin-bottom: 4px; }
+.voting-answer-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+
 .vote-summary-list {
   list-style: none;
   padding: 0;
