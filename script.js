@@ -540,6 +540,12 @@ function hide(id) { $(id).classList.add('hidden'); }
 function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
     show(id);
+
+    if (id === 'landing-screen') {
+        hide('leave-icon');
+    } else {
+        show('leave-icon');
+    }
 }
 
 function randInt(n) { return Math.floor(Math.random() * n); }
@@ -1157,6 +1163,39 @@ function escapeHtml(str) {
     const div = document.createElement('div');
     div.innerText = str;
     return div.innerHTML;
+}
+
+/* ============ Spiel verlassen ============ */
+async function handleLeaveGame() {
+    if (!roomCode) return;
+    if (!confirm('Möchtest du das Spiel wirklich verlassen?')) return;
+
+    try {
+        const snap = await db.ref('rooms/' + roomCode).get();
+        const room = snap.val();
+
+        if (room) {
+            const players = room.players || {};
+            const remainingIds = Object.keys(players).filter(id => id !== playerId);
+
+            if (remainingIds.length === 0) {
+                await db.ref('rooms/' + roomCode).remove();
+            } else {
+                const updates = {};
+                updates[`players/${playerId}`] = null;
+                if (room.hostId === playerId) {
+                    updates.hostId = remainingIds[0];
+                }
+                await db.ref('rooms/' + roomCode).update(updates);
+            }
+        }
+    } catch (e) {
+        console.error('Fehler beim Verlassen:', e);
+    }
+
+    if (roomRef) roomRef.off();
+    clearLocal();
+    location.reload();
 }
 
 /* ============ Init ============ */
