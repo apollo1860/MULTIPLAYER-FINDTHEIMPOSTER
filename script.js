@@ -528,6 +528,10 @@ let roomRef = null;
 let answeringKey = null;   // "<round>-<phase>" – wird nur bei Änderung neu gerendert
 let hasSubmittedLocally = false;
 
+let votingKey = null;
+let hasVotedLocally = false;
+let selectedSuspectId = null;
+
 /* ============ Helpers ============ */
 function $(id) { return document.getElementById(id); }
 function show(id) { $(id).classList.remove('hidden'); }
@@ -747,6 +751,7 @@ function handleStartGame() {
             gameCategories,
             drinkCounts,
             answers: null,
+            votes: null,
             ...roundSetup
         });
     });
@@ -772,6 +777,7 @@ function renderGame(room) {
     switch (room.phase) {
         case 'answering': renderAnswering(room); break;
         case 'answers': renderAnswers(room); break;
+        case 'voting': renderVoting(room); break;
         case 'correct': renderCorrect(room); break;
         case 'imposter': renderImposter(room); break;
         case 'drinks': renderDrinks(room); break;
@@ -795,10 +801,11 @@ function renderAnswering(room) {
         answeringKey = key;
         hasSubmittedLocally = alreadyAnswered;
         $('player-answer').value = '';
-
-        const question = (playerId === room.imposterId) ? room.imposterQuestion : room.majorityQuestion;
-        $('question-text').innerText = question;
     }
+
+    // Frage immer aktuell halten (auch nach "Neue Frage ziehen")
+    const question = (playerId === room.imposterId) ? room.imposterQuestion : room.majorityQuestion;
+    $('question-text').innerText = question;
 
     const hostAndNoAnswersYet = isHost(room) && answeredCount === 0;
     if (hostAndNoAnswersYet) show('reshuffle-btn'); else hide('reshuffle-btn');
@@ -862,6 +869,71 @@ function renderAnswers(room) {
     }
 }
 
+/* ---- Abstimmung ---- */
+function renderVoting(room) {
+    showScreen('voting-screen');
+
+    const players = room.players || {};
+    const votes = room.votes || {};
+    const ids = Object.keys(players);
+    const votedCount = Object.keys(votes).length;
+
+    const key = room.currentRound + '-voting';
+    const alreadyVoted = !!votes[playerId];
+
+    if (key !== votingKey) {
+        votingKey = key;
+        hasVotedLocally = alreadyVoted;
+        selectedSuspectId = null;
+
+        const optionsList = $('voting-options');
+        optionsList.innerHTML = '';
+        ids.forEach(pid => {
+            const li = document.createElement('li');
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.classList.add('vote-option');
+            btn.dataset.pid = pid;
+            btn.innerText = players[pid].name;
+            btn.onclick = () => selectSuspect(pid);
+            li.appendChild(btn);
+            optionsList.appendChild(li);
+        });
+        $('voting-submit-btn').disabled = true;
+    }
+
+    if (hasVotedLocally || alreadyVoted) {
+        hide('voting-form');
+        show('voting-wait');
+        $('voting-progress').innerText = `${votedCount} von ${ids.length} haben abgestimmt.`;
+    } else {
+        show('voting-form');
+        hide('voting-wait');
+    }
+
+    const allVoted = ids.length > 0 && votedCount === ids.length;
+    if (isHost(room) && allVoted) {
+        show('voting-next-btn');
+        hide('voting-wait-hint');
+    } else {
+        hide('voting-next-btn');
+        if (!isHost(room)) show('voting-wait-hint'); else hide('voting-wait-hint');
+    }
+}
+
+function selectSuspect(pid) {
+    selectedSuspectId = pid;
+    const buttons = document.querySelectorAll('#voting-options .vote-option');
+    buttons.forEach(btn => btn.classList.toggle('selected', btn.dataset.pid === pid));
+    $('voting-submit-btn').disabled = false;
+}
+
+function handleSubmitVote() {
+    if (!selectedSuspectId) return;
+    hasVotedLocally = true;
+    db.ref(`rooms/${roomCode}/votes/${playerId}`).set(selectedSuspectId);
+}
+
 /* ---- Richtige Frage ---- */
 function renderCorrect(room) {
     showScreen('correct-screen');
@@ -899,6 +971,29 @@ function renderImposter(room) {
     bar.style.animation = 'none';
     void bar.offsetWidth;
     bar.style.animation = '';
+
+    const votes = room.votes || {};
+    const voteIds = Object.keys(votes);
+    const correctGuesses = voteIds.filter(pid => votes[pid] === room.imposterId).length;
+
+    const summaryEl = $('votes-correct-summary');
+    const listEl = $('votes-summary-list');
+    listEl.innerHTML = '';
+
+    if (voteIds.length > 0) {
+        summaryEl.innerText = `${correctGuesses} von ${voteIds.length} haben richtig getippt.`;
+        voteIds.forEach(pid => {
+            const voterName = players[pid] ? players[pid].name : '???';
+            const suspectId = votes[pid];
+            const suspectName = players[suspectId] ? players[suspectId].name : '???';
+            const li = document.createElement('li');
+            li.innerText = `${voterName} → ${suspectName}`;
+            li.classList.add(suspectId === room.imposterId ? 'correct-guess' : 'wrong-guess');
+            listEl.appendChild(li);
+        });
+    } else {
+        summaryEl.innerText = '';
+    }
 
     if (isHost(room)) {
         show('imposter-next-btn');
@@ -995,6 +1090,7 @@ function hostNextRound() {
             currentRound: nextRoundIndex,
             phase: 'answering',
             answers: null,
+            votes: null,
             ...roundSetup
         });
     });
@@ -1041,6 +1137,7 @@ function hostRestart() {
             phase: null,
             currentRound: 0,
             answers: null,
+            votes: null,
             drinkCounts: null,
             gameCategories: null,
             majorityQuestion: null,
@@ -1048,7 +1145,10 @@ function hostRestart() {
             imposterId: null
         });
         answeringKey = null;
+        votingKey = null;
         hasSubmittedLocally = false;
+        hasVotedLocally = false;
+        selectedSuspectId = null;
     });
 }
 
