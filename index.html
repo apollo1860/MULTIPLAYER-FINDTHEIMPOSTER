@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Find the Imposter 🕵️‍♂️</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="lamp"></div>
+
+<div class="app">
+  <header class="topbar">
+    <span class="topbar-title">FIND THE IMPOSTER</span>
+    <button id="info-icon" class="icon-btn" onclick="openInfoPopup()" aria-label="Spielanleitung">ℹ️</button>
+  </header>
+
+  <div id="info-popup" class="popup hidden">
+    <div class="popup-card">
+      <h3>📋 Akte: Spielregeln</h3>
+      <p>
+        Jede*r spielt auf dem eigenen Handy. Eine Person erstellt einen Raum und bekommt einen <strong>Beitrittscode</strong> – alle anderen treten damit bei.
+        Sobald der Host startet, bekommt jede*r eine eigene Frage aus derselben Kategorie angezeigt. Doch Vorsicht: <strong>Eine Person ist der Imposter</strong> und hat eine andere Frage bekommen!<br><br>
+        Alle tippen still ihre Antwort ein. Sind alle fertig, werden alle Antworten gleichzeitig aufgedeckt – kurz darauf folgt die „richtige" Frage. Jetzt wird diskutiert, spekuliert und geraten: <strong>Wer war der Imposter?</strong><br><br>
+        Wird der Imposter enttarnt, muss er trinken. Täuscht er alle, trinken die anderen.<br><br>
+        Nach 15 Runden gewinnt, wer die wenigsten Schlücke gesammelt hat und darf zur Belohnung <strong><span id="reward-info">–</span> Schlücke</strong> verteilen.
+      </p>
+      <button class="btn btn-primary" onclick="closeInfoPopup()">Akte schließen</button>
+    </div>
+  </div>
+
+  <main class="stage">
+
+    <section id="landing-screen" class="screen">
+      <div class="card">
+        <p class="eyebrow">Fall Nr. 001</p>
+        <h1>Find the<br>Imposter</h1>
+        <p class="tagline">Einer lügt. Alle raten.</p>
+
+        <div class="field-group">
+          <label for="landing-name">Dein Name</label>
+          <input id="landing-name" placeholder="z.B. Anton" maxlength="20" autocomplete="off">
+        </div>
+        <button class="btn btn-primary" onclick="handleCreateRoom()">Raum erstellen</button>
+
+        <div class="divider"><span>oder beitreten</span></div>
+
+        <div class="field-group">
+          <label for="landing-code">Beitrittscode</label>
+          <input id="landing-code" placeholder="0000" maxlength="4" inputmode="numeric" autocomplete="off">
+        </div>
+        <button class="btn btn-secondary" onclick="handleJoinRoom()">Raum beitreten</button>
+
+        <p id="landing-error" class="error-text hidden"></p>
+      </div>
+    </section>
+
+    <section id="lobby-screen" class="screen hidden">
+      <div class="card">
+        <p class="eyebrow">Beitrittscode</p>
+        <div id="lobby-code" class="room-code"></div>
+        <h2>Warteraum</h2>
+        <ul id="lobby-players" class="player-list"></ul>
+        <p id="lobby-hint" class="hint-text"></p>
+        <button id="lobby-start-btn" class="btn btn-primary hidden" onclick="handleStartGame()">Spiel starten</button>
+      </div>
+    </section>
+
+    <section id="answering-screen" class="screen hidden">
+      <div class="card">
+        <p class="eyebrow" id="answering-round"></p>
+
+        <div id="answering-form">
+          <p class="question-label">Deine Frage</p>
+          <p id="question-text" class="question-text"></p>
+          <input id="player-answer" placeholder="Antwort eingeben" maxlength="80" autocomplete="off">
+          <button class="btn btn-primary" onclick="handleSubmitAnswer()">Antwort abschicken</button>
+          <button id="reshuffle-btn" class="btn btn-ghost hidden" onclick="handleReshuffle()">🔄 Neue Frage ziehen</button>
+        </div>
+
+        <div id="answering-wait" class="hidden wait-block">
+          <div class="spinner"></div>
+          <p class="wait-title">Antwort gespeichert</p>
+          <p id="answering-progress" class="hint-text"></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="answers-screen" class="screen hidden">
+      <div class="card">
+        <p class="eyebrow">Enthüllung</p>
+        <h2>Antworten</h2>
+        <ul id="answers-list" class="answer-list"></ul>
+        <button id="answers-next-btn" class="btn btn-primary hidden" onclick="hostAdvance('correct')">Weiter</button>
+        <p id="answers-wait-hint" class="hint-text hidden">Warte auf den Host …</p>
+      </div>
+    </section>
+
+    <section id="correct-screen" class="screen hidden">
+      <div class="card">
+        <p class="eyebrow">Die richtige Frage war</p>
+        <p id="correct-question-text" class="question-text"></p>
+        <h3>Alle Antworten</h3>
+        <ul id="correct-answers-list" class="answer-list"></ul>
+        <button id="correct-next-btn" class="btn btn-primary hidden" onclick="hostAdvance('imposter')">Weiter</button>
+        <p id="correct-wait-hint" class="hint-text hidden">Warte auf den Host …</p>
+      </div>
+    </section>
+
+    <section id="imposter-screen" class="screen hidden">
+      <div class="card imposter-card">
+        <p class="eyebrow">Enttarnt</p>
+        <div class="redact-wrap">
+          <p id="imposter-text" class="imposter-name"></p>
+          <div id="redact-bar" class="redact-bar"></div>
+        </div>
+        <button id="imposter-next-btn" class="btn btn-primary hidden" onclick="hostAdvance('drinks')">Weiter</button>
+        <p id="imposter-wait-hint" class="hint-text hidden">Warte auf den Host …</p>
+      </div>
+    </section>
+
+    <section id="drinks-screen" class="screen hidden">
+      <div class="card">
+        <h2>Schluckvergabe</h2>
+        <div id="drinks-list" class="drinks-list"></div>
+        <button id="drinks-next-btn" class="btn btn-primary hidden" onclick="hostNextRound()">Nächste Runde</button>
+        <p id="drinks-wait-hint" class="hint-text hidden">Warte auf den Host …</p>
+      </div>
+    </section>
+
+    <section id="final-screen" class="screen hidden">
+      <div class="card">
+        <p class="eyebrow">Akte geschlossen</p>
+        <h2>Spiel beendet!</h2>
+        <ol id="ranking-list" class="ranking-list"></ol>
+        <p id="reward-summary" class="reward-text"></p>
+        <button id="final-restart-btn" class="btn btn-primary hidden" onclick="hostRestart()">Neue Runde starten</button>
+        <p id="final-wait-hint" class="hint-text hidden">Warte auf den Host …</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
