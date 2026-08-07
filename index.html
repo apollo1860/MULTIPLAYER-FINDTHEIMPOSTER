@@ -94,8 +94,29 @@
         <p class="eyebrow">Enthüllung</p>
         <h2>Antworten</h2>
         <ul id="answers-list" class="answer-list"></ul>
-        <button id="answers-next-btn" class="btn btn-primary hidden" onclick="hostAdvance('correct')">Weiter</button>
+        <button id="answers-next-btn" class="btn btn-primary hidden" onclick="hostAdvance('voting')">Weiter</button>
         <p id="answers-wait-hint" class="hint-text hidden">Warte auf den Host …</p>
+      </div>
+    </section>
+
+    <section id="voting-screen" class="screen hidden">
+      <div class="card">
+        <p class="eyebrow">Abstimmung</p>
+        <h2>Wer ist der Imposter?</h2>
+
+        <div id="voting-form">
+          <ul id="voting-options" class="vote-list"></ul>
+          <button id="voting-submit-btn" class="btn btn-primary" disabled onclick="handleSubmitVote()">Stimme abschicken</button>
+        </div>
+
+        <div id="voting-wait" class="hidden wait-block">
+          <div class="spinner"></div>
+          <p class="wait-title">Stimme gespeichert</p>
+          <p id="voting-progress" class="hint-text"></p>
+        </div>
+
+        <button id="voting-next-btn" class="btn btn-primary hidden" onclick="hostAdvance('correct')">Weiter</button>
+        <p id="voting-wait-hint" class="hint-text hidden">Warte auf den Host …</p>
       </div>
     </section>
 
@@ -117,6 +138,8 @@
           <p id="imposter-text" class="imposter-name"></p>
           <div id="redact-bar" class="redact-bar"></div>
         </div>
+        <p id="votes-correct-summary" class="hint-text"></p>
+        <ul id="votes-summary-list" class="vote-summary-list"></ul>
         <button id="imposter-next-btn" class="btn btn-primary hidden" onclick="hostAdvance('drinks')">Weiter</button>
         <p id="imposter-wait-hint" class="hint-text hidden">Warte auf den Host …</p>
       </div>
