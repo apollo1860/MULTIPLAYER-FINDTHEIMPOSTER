@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="lamp" cx="256" cy="190" r="260" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f2c06a"/>
+      <stop offset="0.35" stop-color="#e3a53d" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#15130f" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="#15130f"/>
+  <rect width="512" height="512" fill="url(#lamp)"/>
+  <g fill="#0d0b08">
+    <!-- shoulders + coat -->
+    <path d="M86 512 C96 420 160 372 256 372 C352 372 416 420 426 512 Z"/>
+    <!-- upturned collar -->
+    <path d="M170 392 L214 330 L256 400 L298 330 L342 392 L256 452 Z"/>
+    <!-- head -->
+    <ellipse cx="256" cy="300" rx="70" ry="72"/>
+    <!-- hat crown -->
+    <path d="M168 252 C170 190 182 148 202 132 C226 146 286 146 310 132 C330 148 342 190 344 252 Z"/>
+    <!-- hat brim -->
+    <path d="M92 262 C140 234 372 234 420 262 C384 284 128 284 92 262 Z"/>
+  </g>
+  <!-- hat band -->
+  <path d="M171 222 C226 232 286 232 341 222 L343 246 C286 256 226 256 169 246 Z" fill="#b9791f"/>
+  <!-- glinting eyes -->
+  <g fill="#e3a53d">
+    <path d="M214 304 C222 296 238 296 246 304 C238 308 222 308 214 304 Z"/>
+    <path d="M266 304 C274 296 290 296 298 304 C290 308 274 308 266 304 Z"/>
+  </g>
+</svg>
